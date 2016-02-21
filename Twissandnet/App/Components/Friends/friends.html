@@ -1,0 +1,32 @@
+﻿<div class="row">
+    <div class="col-md-6">
+        <span>Find your friends:</span>
+        <form class="inline-form" ng-submit="search()">
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-addon">@</div>
+                    <input type="text" class="form-control" placeholder="User" ng-model="search.query">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <div>
+            {{search.message}}
+            <button ng-show="search.buttonAction" ng-click="buttonClick()" class="btn btn-default">{{search.buttonText}}</button>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <h4 ng-show="Account.isLoggedIn()">Currently you have {{friends.length}} friends!</h4>
+        <h4 ng-hide="Account.isLoggedIn()">Login to view your friends.</h4>
+        <hr />
+        <div ng-show="friends.length">
+            <span>Your friends:</span>
+            <ul>
+                <li ng-repeat="friend in friends">
+                    <a href="/user/{{friend}}">@{{friend}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,32 @@
+CREATE KEYSPACE twissandnet WITH replication = {'class': 'SimpleStrategy', 'replication_factor': '1'};
+
+USE twissandnet;
+
+CREATE TABLE users (
+  username text PRIMARY KEY,
+  password text
+);
+
+CREATE TABLE friends (
+  username text PRIMARY KEY,
+  friends set<text>
+);
+
+
+CREATE TABLE tweets (
+	id uuid,
+	originaltext text,
+	hashtags set<text>,
+	timestamp timestamp,
+	username text,
+	PRIMARY KEY (id, timestamp)
+) WITH CLUSTERING ORDER BY (timestamp DESC);              
+
+CREATE INDEX tweet_hashtags    
+ON tweets (hashtags);
+
+CREATE TABLE user_tweets (
+  username text,
+  tweets set<uuid>,
+  PRIMARY KEY (username)
+);

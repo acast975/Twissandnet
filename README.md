@@ -21,7 +21,7 @@ Start the DevCenter you have just installed. Once it is opened, create new conne
 - Port: 9042 (the default port)
 
 Click 'Try to establish a connection' to check if the connection and the DB is working.
-After setting up the connection, copy contents of [CQL Commands File](address) to DevCenter, and click Execute CQL Script, or press ALT+F11.
+After setting up the connection, copy contents of [CQL Commands File](Twissandnet/CQL Commands.txt) to DevCenter, and click Execute CQL Script, or press ALT+F11.
 You should now have the database all set up.
 
 ### Download the project

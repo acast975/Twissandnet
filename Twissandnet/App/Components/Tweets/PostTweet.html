@@ -1,0 +1,30 @@
+﻿<form class="form-horizontal" ng-submit="postTweet()">
+    <fieldset>
+        <!-- Form Name -->
+        <legend>New Tweet</legend>
+
+        <!-- Textarea -->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for="">Tweet</label>
+            <div class="col-md-8">
+                <textarea class="form-control" ng-model="tweet"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-md-4 control-label" for=""></label>
+            <div class="col-md-8">
+                <span>You have {{tweetLength - tweet.length}} characters remaining.</span>
+            </div>
+        </div>
+
+        <!-- Button -->
+        <div class="form-group">
+            <label class="col-md-4 control-label" for=""></label>
+            <div class="col-md-8">
+                <button type="submit" class="btn btn-primary">Post tweet</button>
+            </div>
+        </div>
+
+    </fieldset>
+</form>

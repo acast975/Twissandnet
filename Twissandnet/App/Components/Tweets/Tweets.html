@@ -1,0 +1,7 @@
+﻿<h4>{{tweetsSource.source}}</h4>
+<ul>
+    <li class="tweet-message" ng-repeat="tweet in tweetsSource.tweets | orderBy: '-timestamp'">
+        <a href="/user/{{tweet.username}}">{{tweet.username}}</a>: <span ng-bind-html="tweet.text"></span>
+        <hr />
+    </li>
+</ul>
