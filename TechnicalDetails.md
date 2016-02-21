@@ -114,6 +114,8 @@ Account controller contains all functions used for:
 On the top of the controller, there are few prepared statements. Prepared statements should be used when the same query is being used multiple times with different parameters. In each function when there is a prepared statement used, it is first checked if the statement is null. If it is, it is then created, and used after that.
 The same goes for prepared statements in TweetsController.
 
+Note: In this example, password is stored without any modifications into the database. In real life scenario, you should always encrypt the password using one-way encryption and salt. Also, as mentioned, we are using session to keep track of our users. That is a bad practice with WebApi. A good choice here would be JWT.
+
 ### Tweets Controller
 This is where all of the magic related to tweets happen. 
 There are 
