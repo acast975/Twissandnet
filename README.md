@@ -27,7 +27,7 @@ You should now have the database all set up.
 ### Download the project
 To download the project, you need to have git installed. Open Command Prompt, go to the directory you want to save the project and type this:
 ```
-git clone ...
+git clone https://github.com/PavlovicDzFilip/Twissandnet.git
 ```
 The files will now download in your directory.
 ### Starting the project
@@ -35,7 +35,7 @@ Once you have downloaded the project, go to Twissandnet directory and open the s
 Twissandnet is now running!
 
 ## Note
-To read the technical details, open [Technical Details](details.md) readme file. 
+To read the technical details, open [Technical Details](TechnicalDetails.md) readme file. 
 There I have some info on how the database and the rest of the system works.
 
 License
