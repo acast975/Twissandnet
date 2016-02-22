@@ -132,32 +132,92 @@ There are
     - GetTweetsById - returns all tweets by given id
 
 ### [AngularJS](http://angularjs.org)
-All of the code for the application is in App folder. Vendor folder contains scripts downloaded from the internet, and Components folder contains scripts and html used by our application. This is not a tutorial on angular therefore we will only go briefly through the app.
+All of the code for the application is in App folder. Vendor folder contains scripts downloaded from the internet, and Components folder contains scripts and html used by our application. This is not a tutorial on angular therefore we will only go briefly through the app. Minimal knowledge of the framework, like data binding, is required to understand how it works. 
 
 ### App folder
 App folder contains ```app.js``` and ```app.router.js```. 
 
-```app.js``` file is used to initialize our AngularJS aplication. There we put the modules we need for our app. ```app.router.js``` file is used to route the urls. It specifies the url schemas, templates and controllers to use for our app.
+```app.js``` file is used to initialize our AngularJS aplication. There we put the modules we need for our app. ```app.router.js``` file is used to route the urls. It specifies the url schemas, templates and controllers to use for every route in our app.
+
+Url schemas we have define include 
+  - /index
+  - /friends
+  - /public
+  - /user/:usr, where the user is anything passed on, for example, in /user/slash url, usr is defined as 'slash'
+  - /hashtag/:tag
+
+Each of these specifies templateUrl, which is a link to the html markup to display when on these urls. ```/friends``` also specifies controller, which we will explain later.
+
+If none of these url schemas are matched, we tell the router to redirect us to ```/index``` using this code:
+```
+.otherwise({ redirectTo: '/index' });
+```
+
+We also define ```StatusCodes``` factory here, which contains only status codes used in the apps that do not belong anywhere else. For example, Status Codes that can be returned from Accounts Controller are in ```Account``` factory. More info on that below.
 
 ### Account folder
 Contains only one script, ```app.account.js```. This script defines factory ```Account``` which contains all the functions which interact with our API we have previously defined. There is also a controller named ```AccountNavbarCtrl``` which is used to control login/register forms and logout button.
 
+```Account``` factory exposes functions to manage accounts:
+  - isLoggedIn - returns boolean that indicates if the user is currently logged in
+  - logIn - sends a request to the server to login the user. After recieving the response, we check if the Response Status Code is OK, which means that you are now logged in. Other message that can be recieved is that username/password combination is not correct. On successful login, we re-route the application to load the tweets for the current user
+  - register - sends a request to the server. After that checks the response code and displays the message if there are any errors, same as login function
+  - logOut - sends a request to the server to logout the current user. There is no data send to the server, and response is not awaited for, we assume this action will not fail on the server side. Does reloading the page to index
+  - getUsername - returns username if user is logged in or an empty string if not
+  
+In this factory, not exposed, we have ```ACCOUNT_STATUS_CODES``` and ```ACCOUNT_STATUS_MESSAGES``` which define messages to display for each status code returned from the server. This way we do not depend on the server returned messages and can implement our own given the status codes. 
+
+Last thing we do in this factory is, when the application is first loaded, we send a request to the server to check if the user is currently logged in. User will be logged in when comes on the site if the session on the server has not yet expired and the user was logged in on last visit. If the user is logged in, set the username to the returned value.
+
+Note: Factories in AngularJS are singleton objects. This means only one instance of each object is created in the app's lifetime. The same object is passed on to each of the controllers, factories and other utilities we are using. Changing the object from one controller will have impact on other controllers. This is a wanted behaviour, and we are using it to share some variables, like the exposed API in this factory.
+
+```AccountNavbarCtrl``` controller only uses ```Account``` factory to login, register and logout users. Its functions are basically just wrappers around Account factory's functions.
+
+There is also a watch set up to monitor any changes made on username fields for login and register forms. Whenever any of those two change, we set the value to not contain any special characters. Ofcourse, validation should also be done on server.
+
 ### Friends folder
-This folder contains html file which renders view on ```/friends``` url. The app.friends.js file contains functions to search for users, add them and remove them as friends.
+This folder contains html file which renders view on ```/friends``` url, and the ```app.friends.js``` file contains functions to search for users, add them and remove them as friends. 
+
+Friends.html file is nothing else but html markup code that will be rendered. One thing to take care of here is that form has ```ng-submit="search()"``` which tells AngularJS that instead of submiting the form, it should execute search function. The same goes for ```ng-click="buttonClick()"```. The search and button click functions are defined in ```FriendsCtrl```. How does AngularJS know which controller to use? Well, it is specified in the ```app.router.js``` file, with this code: 
+```
+[code]
+.when('/friends', {
+    templateUrl: '/App/Components/Friends/friends.html',
+    controller: 'FriendsCtrl'
+})
+[more code]
+```
+
+In ```FriendsCtrl``` controller, we first require Account, StatusCodes, $http and $scope to be injected. Account we will get here is the same account we have in any other controller. It is singleton. Same goes for StatusCodes where we have defined only a few codes, which are not used locally (like Account status codes).
+
+Controllers are not singletons. This controller is loaded each time /friends url is visited. And each time it is loaded, it queries the server to fetch your friends. This is done using this code:
+```
+$http.get('/api/Accounts/GetFriends')
+    .then(function (event) {
+        if(event.data.status == StatusCodes.CODES.OK)
+            $scope.friends = event.data.result;
+    });
+```
+
+We defined functions search and buttonClick which are used on form submit and button click. The search function takes your input, which is binded to ```$scope.search.query```, checks if you already have a friend with given name in the list, and if you do displays message and shows button to remove the friend. It also sets the button action which will be used on button click. If the user you search for is not found, it then checks if the username given is not the same as yours. And lastly, if it is not, a request will be sent to the server to check if the user exists. Upon returning the result, a message is displayed and button shown to add user as a friend if he is registered.
+
+The buttonClick function adds or removes friend you have last searched for. What the button does depends on what action is set after searching for the user.
 
 ### Index folder
-There is only an html file which defines the index view. It uses ```tweets``` directive to display tweets, and ```post-tweet``` directive to display form for posting new tweets.
+There is only an html file which defines the index view. It uses ```tweets``` directive to display tweets, and ```post-tweet``` directive to display form for posting new tweets. 
+
+Directive is nothing else but shortened, custom defined html element. These elements are defined somewhere else. In this case, both directives we use here are defined in Tweets folder.
 
 ### Tweets folder
-This folder contains most of the code. ```PostTweet.html``` is the html to render ```post-tweet``` directive. It is hooked up with the directive code in ```app.tweets.js``` file. 
+This folder contains most of the code. ```PostTweet.html``` is the html to render ```post-tweet``` directive. It is hooked up with the directive code in ```app.tweets.js``` file.  The directive code here is only a wrapper to use ```Tweets``` factory (defined below), to post new tweets to the server.
 
-```Tweets.html``` is the html to render tweets returned from the server. Here we specify to order the tweets by timestamp so they are always in correct order, from the newest to the oldest. The directive code is found in ```app.tweets.js``` file.
+```Tweets.html``` is the html to render tweets returned from the server, in place of ```<tweets></tweets>``` custom html elements. In this template, we specify to order the tweets by timestamp so they are always in correct order, from the newest to the oldest. The directive code is found in ```app.tweets.js``` file. The code here triggers ```Tweets.onLocationChange();``` function every time the directive is displayed. More info on that function comes later.
 
 And lastly, the file ```app.tweets.js```, which contains the following functions:
-  - parseTweet - parses tweet and adds hashtags and users to the tweet data. Also parses link to the users so you can type @user and get a link.
+  - parseTweet - parses tweet and adds hashtags and users to the tweet data. Also parses links to the users so you can type @user and get a link.
   - addTweet - adds tweet to the local array of tweets, only if the tweet should be displayed. For example, if you are looking at tweets with hashtag '#tag1', and the posted tweet does not contain that hashtag, it will not be added
   - postTweet - sends the tweet to the server to be permanently stored
-  - implements onLocationChange function, which monitors the url and requests tweets when the url is changed. For example, if you are looking at tweets with hashtag '#tag1' and change to tweets with hashtag '#tag2', this function will request new tweets from the server.
+  - implements onLocationChange function, which monitors the url and requests tweets when the url is changed. Whenever the url is changed, we look if it is equal to ```/public```, ```/index```, ```/user/:usr``` or ```/hashtag/:tag```. Based on what the url starts with, we send a request to the server to fetch data. For example, if the url is ```/hashtag/tag1```, we send a request to ```/api/Tweets/GetHashtagTweets``` and add tag1 to the params to search for on the server side. When the request is finished, if the status code is OK, we parse the data and put it in ```tweets``` variable. Our previously defined ```<tweets></tweets>``` directive reads from this variable and displays the data we see.
   
 That is the whole application described. Once again, the point of the application is to learn and use Cassandra, not Asp.net Web Api or AngularJS. That is why we only briefly described the last two.
 
