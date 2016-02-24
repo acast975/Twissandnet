@@ -221,4 +221,11 @@ And lastly, the file ```app.tweets.js```, which contains the following functions
   
 That is the whole application described. Once again, the point of the application is to learn and use Cassandra, not Asp.net Web Api or AngularJS. That is why we only briefly described the last two.
 
-Feel free to use this code, and happy hacking!
+### Homework
+After you have read the code, there is some homework for you to be done, to get a better understanding of the app and practice a bit. 
+Try this:
+  - Change methods on the server to include start timestamp and limit integer, so when you query the data, you don't fetch all of it in a single request. Imagine what would happen if Twitter would show you the whole database they have.
+  - Cache results in AngularJS, and utilize the previous function to get only new data. Also, use caching to store tweets for different hashtags, users..
+  - Change the database design. You can omit ````user_tweets table```, but that would also require some code changes
+  
+Feel free to use this code, with respect to the [MIT License](https://opensource.org/licenses/MIT). Have fun coding and hacking!
